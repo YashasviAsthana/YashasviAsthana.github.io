@@ -11,7 +11,7 @@ const C = CONTENT;
 const T = C.talk;
 
 const SW = 168, SH = 96; // animation stage, CSS px
-const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const REDUCED = false; // always animate, whatever the OS motion preference says
 
 // ===== small helpers =====
 const rnd = (a, b) => a + Math.random() * (b - a);

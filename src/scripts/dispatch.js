@@ -95,8 +95,8 @@ export function initDispatch() {
   const mctx = LIVE ? monitor.getContext("2d") : null;
   const staticCanvas = document.createElement("canvas");
   const sctx = staticCanvas.getContext("2d");
-  const reducedMq = matchMedia("(prefers-reduced-motion: reduce)");
-  let reduced = reducedMq.matches;
+  // The page always animates, whatever the OS motion preference says.
+  const reduced = false;
 
   // Small DOM enhancements the static HTML leaves to the script.
   if (matchMedia("(pointer: coarse)").matches) {
@@ -1790,13 +1790,6 @@ export function initDispatch() {
     }, { once: true });
   }
   watchDpr();
-
-  reducedMq.addEventListener("change", () => {
-    reduced = reducedMq.matches;
-    console.info("[dispatch] reduced motion " + (reduced ? "on: still frame" : "off: animating"));
-    syncLoop();
-    if (reduced) renderStill();
-  });
 
   if (document.fonts) {
     document.fonts.addEventListener("loadingdone", () => { repaint(); scheduleRelayout(60, "font load"); });

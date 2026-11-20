@@ -61,7 +61,7 @@ export function initStage(FS) {
   const SYS = CONTENT.nimble.systems;
   const SLOT_IDS = ["floor", ...SYS.map((s) => s.id)];
   const COARSE = matchMedia("(pointer: coarse)").matches;
-  const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const REDUCED = false; // always animate, whatever the OS motion preference says
   const desktopMq = matchMedia("(min-width: 960px)");
   const stepEls = $$(".step", section);
   let FALLBACK = false;

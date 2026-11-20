@@ -254,9 +254,6 @@
 .sw-pick { background: var(--accent); }
 .sw-drop { background: var(--accent-2); }
 .sw-charge { background: var(--ink); }
-@media (prefers-reduced-motion: reduce) {
-  .lbl, .step-inner::before, .step-body, .stage-tick::before { transition: none; }
-}
 
 /* The still floor stands in while the WebGL stage loads, and for good if WebGL2
    is missing or fails; it hides once the stage is live. */
