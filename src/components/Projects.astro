@@ -1,0 +1,53 @@
+---
+// "Also building": the side projects as a quiet ledger, then open source as
+// one plain line. vLLM appears nowhere else on the page.
+import { CONTENT } from "../data/content";
+
+const work = CONTENT.work.filter((w) => w.id !== "nimble");
+---
+
+<section class="section section--quiet" aria-labelledby="work-h">
+  <div class="grid">
+    <div class="sec-head sec-head--wide">
+      <h2 id="work-h" class="h2--quiet">{CONTENT.projectsHeading}</h2>
+    </div>
+    <div class="sec-full">
+      <ul class="rows">
+        {
+          work.map((w) => (
+            <li class="row">
+              <div class="row-head">
+                <h3 class="row-title">{w.href ? <a class="hit" href={w.href}>{w.title}</a> : w.title}</h3>
+                <p class="row-org">{w.org}</p>
+              </div>
+              <div class="row-body">
+                <p class="row-pitch">{w.pitch}</p>
+                {w.tags.length > 0 && (
+                  <ul class="tags" aria-label="Topics">
+                    {w.tags.map((t) => <li>{t}</li>)}
+                  </ul>
+                )}
+              </div>
+              <p class="row-meta">
+                <span>{w.kind}</span>
+                <span>{w.years}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="sec-full oss">
+      <h3 class="minor-h">{CONTENT.openSourceHeading}</h3>
+      <ul class="oss-list">
+        {
+          CONTENT.openSource.map((o) => (
+            <li>
+              <span class="oss-name">{`${o.project}: `}</span>{`${o.what}. `}<a href={o.href}>{o.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

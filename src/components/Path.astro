@@ -1,0 +1,44 @@
+---
+// The path (timeline), then research as a compact linked list, then earlier
+// projects as one line.
+import { CONTENT } from "../data/content";
+---
+
+<section class="section" aria-labelledby="path-h">
+  <div class="grid">
+    <div class="sec-head">
+      <h2 id="path-h">{CONTENT.pathHeading}</h2>
+    </div>
+    <div class="sec-body">
+      <ol class="path">
+        {
+          CONTENT.path.map((p) => (
+            <li class:list={{ "is-now": /now/i.test(p.years) }}>
+              <span class="path-years">{p.years}</span>
+              <div>
+                <p class="path-what">{p.what}</p>
+                <p class="path-where">{p.href ? <a href={p.href}>{p.where}</a> : p.where}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="research">
+        <h3 class="research-h">{CONTENT.researchHeading}</h3>
+        <ul class="research-list">
+          {
+            CONTENT.research.map((r) => (
+              <li>
+                <a class="research-title" href={r.href}>
+                  {r.title}
+                </a>
+                <p class="research-meta">{`${r.kind}, ${r.year}${r.note ? `. ${r.note}` : ""}`}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <p class="earlier"><b>{`${CONTENT.earlierLabel} `}</b>{`${CONTENT.earlier.join(", ")}.`}</p>
+    </div>
+  </div>
+</section>

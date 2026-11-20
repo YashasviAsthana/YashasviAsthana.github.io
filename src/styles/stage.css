@@ -1,0 +1,340 @@
+/* Variant E (the default): the Nimble section as a framed, sticky stage onto
+   the hero's floor, ported from the A + D blend. Imported by NimbleStage.astro
+   only, so variant A's build never includes it. Its class names (story-*,
+   stage-*, step*, section--stage) do not appear in global.css, which keeps
+   variant A's Nimble rules, so neither variant's rules reach the other's markup.
+
+   The stage is A's live-view frame. Inside it, the floor and D's five systems are
+   drawn as points; its background is the hero's grid at the hero's cell size. */
+
+:root {
+  --bar-h: 40px;
+  --foot-h: 92px;
+  --view-h: clamp(300px, calc(100vh - 232px), 620px);
+  --stage-h: calc(var(--view-h) + var(--bar-h) + var(--foot-h) + 2px);
+  --stage-top: max(16px, calc((100vh - var(--stage-h)) / 2));
+  --grid-line: color-mix(in srgb, var(--line) 78%, transparent);
+}
+
+/* Two classes each, so these win over .section and .grid wherever this file lands in the bundle. */
+.section.section--stage { padding-top: clamp(88px, 11vw, 156px); }
+.grid.story { row-gap: 0; align-items: start; }
+
+.story-head {
+  grid-column: 1 / span 5;
+  grid-row: 1;
+  min-width: 0;
+  padding-bottom: clamp(56px, 12vh, 120px);
+}
+.story-meta { margin: 14px 0 0; color: var(--muted); }
+/* Inline link: same line box, 40px tall hit area. */
+.story-meta a {
+  padding-block: 10px;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in srgb, var(--ink) 35%, transparent);
+}
+.story-meta a:hover { text-decoration-color: var(--accent-2); text-decoration-thickness: 2px; }
+.story-head .tags { margin-top: 16px; }
+.story-intro {
+  margin: 30px 0 0;
+  max-width: 46ch;
+  font-size: clamp(1.08rem, 1rem + 0.32vw, 1.25rem);
+  line-height: 1.5;
+}
+/* The one illustration notice for the section, quiet and close to the stage. */
+.disclaimer {
+  position: relative;
+  margin: 26px 0 0;
+  padding-left: 18px;
+  max-width: 50ch;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+.disclaimer::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 4px; bottom: 4px;
+  width: 6px;
+  background: repeating-linear-gradient(-45deg, var(--accent) 0 3px, transparent 3px 6px);
+  opacity: 0.6;
+}
+
+.stage-col { grid-column: 6 / -1; grid-row: 1 / span 2; min-width: 0; align-self: stretch; }
+.steps { grid-column: 1 / span 5; grid-row: 2; list-style: none; margin: 0; padding: 0; min-width: 0; }
+
+/* Steps: each one holds beside the stage while its system is on screen. */
+.step { position: relative; min-height: 86vh; }
+.step:last-child { min-height: calc(var(--stage-h) + var(--stage-top)); }
+.step-inner {
+  position: sticky;
+  top: var(--stage-top);
+  padding: 24px 0 30px 24px;
+  border-top: 1px solid var(--line);
+}
+.step-inner::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 28px; bottom: 34px;
+  width: 3px;
+  background: var(--line);
+  transition: background-color 160ms ease;
+}
+.step.is-active .step-inner::before { background: var(--accent-2); }
+.step-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: calc(var(--d-lead) + 0.04);
+  font-size: calc(clamp(1.9rem, 1.3rem + 1.4vw, 2.7rem) * var(--d-scale));
+  text-wrap: balance;
+}
+.step-name button { all: unset; cursor: pointer; color: var(--ink); }
+.step-name button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 4px; }
+.step-body {
+  margin: 14px 0 0;
+  max-width: 44ch;
+  color: var(--muted);
+  font-size: clamp(1.02rem, 0.98rem + 0.2vw, 1.125rem);
+  line-height: 1.55;
+  transition: color 160ms ease;
+}
+.step.is-active .step-body { color: var(--ink); }
+
+.stage {
+  position: sticky;
+  top: var(--stage-top);
+  margin: 0;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.stage-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--bar-h);
+  padding: 0 8px 0 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: var(--muted);
+}
+.stage-dot { flex: none; width: 8px; height: 8px; border-radius: 2px; background: var(--accent-2); }
+.stage-label { min-width: 0; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stage-ticks { display: flex; margin-left: auto; flex: none; }
+.stage-tick {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 24px; height: 32px;
+  cursor: pointer;
+}
+.stage-tick::before {
+  content: "";
+  width: 9px; height: 9px;
+  border-radius: 2px;
+  border: 1.5px solid color-mix(in srgb, var(--muted) 80%, transparent);
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+.stage-tick:hover::before { border-color: var(--ink); }
+.stage-tick[aria-current="step"]::before { background: var(--accent-2); border-color: var(--accent-2); }
+.stage-tick:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -4px; }
+
+.stage-view {
+  position: relative;
+  height: var(--view-h);
+  overflow: hidden;
+  background: var(--bg);
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+/* The hero's floor joints, continued: same cell size, same column positions. */
+.stage-view::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--cell, 30px) var(--cell, 30px);
+  background-position: var(--gx, 0px) var(--gy, 0px);
+  opacity: var(--grid-a, 1);
+}
+.stage-canvas, .stage-still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.stage-still { display: none; }
+.no-webgl .stage-canvas, .stage-failed .stage-canvas { display: none; }
+.no-webgl .stage-still, .stage-failed .stage-still { display: block; }
+.stage-view[data-cursor="pointer"] { cursor: pointer; }
+.stage-view[data-cursor="grab"] { cursor: grab; }
+.stage-view[data-cursor="grabbing"] { cursor: grabbing; }
+.stage-view[data-cursor="crosshair"] { cursor: crosshair; }
+
+/* Labels projected from the points: A's floor pills. */
+.stage-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lbl {
+  position: absolute;
+  left: 0; top: 0;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--muted);
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  opacity: 0;
+  transition: opacity 0.25s, color 0.2s, border-color 0.2s;
+  will-change: transform;
+}
+.lbl small { display: block; font-size: 9.5px; color: var(--muted); }
+.lbl.on { color: var(--ink); border-color: color-mix(in srgb, var(--accent-2) 70%, transparent); }
+.lbl.tip { color: var(--ink); border-color: var(--accent); background: color-mix(in srgb, var(--bg) 96%, transparent); }
+.a-up { translate: -50% calc(-100% - 4px); }
+.a-down { translate: -50% 4px; }
+.a-left { translate: calc(-100% - 6px) -50%; text-align: right; }
+.a-right { translate: 6px -50%; }
+.a-mid { translate: -50% -50%; }
+
+/* Footer: the hint and controls for whatever the stage shows, in A's mono readout style. */
+.stage-foot {
+  height: var(--foot-h);
+  overflow: hidden;
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.ctl-set[hidden] { display: none; }
+.ctl-hint { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ctl-tile { flex: none; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); }
+.ctl-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 9px; }
+.no-webgl .ctl-row, .stage-failed .ctl-row { display: none; }
+.ctl {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 11px;
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+.ctl:hover { border-color: var(--ink); }
+.ctl:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.ctl:disabled { opacity: 0.4; cursor: default; border-color: color-mix(in srgb, var(--ink) 30%, transparent); }
+.ctl--small { min-height: 24px; padding: 0 8px; font-size: 0.75rem; }
+.ctl--quiet { color: var(--muted); border-color: var(--line); }
+.stage-readout { margin: 0; font-variant-numeric: tabular-nums; }
+.stage-readout strong, .stage-readout b { color: var(--ink); font-weight: 500; }
+.legend { display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 0; padding: 0; list-style: none; }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.sw { display: inline-block; width: 14px; height: 8px; border-radius: 2px; }
+.sw-travel { border: 1px dashed var(--muted); }
+.sw-pick { background: var(--accent); }
+.sw-drop { background: var(--accent-2); }
+.sw-charge { background: var(--ink); }
+@media (prefers-reduced-motion: reduce) {
+  .lbl, .step-inner::before, .step-body, .stage-tick::before { transition: none; }
+}
+
+/* The still floor stands in while the WebGL stage loads, and for good if WebGL2
+   is missing or fails; it hides once the stage is live. */
+.stage-still { display: block; }
+.stage-live .stage-still { display: none; }
+
+/* Footer controls keep their compact look but get a 40px tall hit area. */
+.ctl { position: relative; }
+.ctl::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 40px; transform: translateY(-50%); }
+
+/* Without JavaScript there is no stage: the systems read as a plain list. */
+.no-js .story-head { grid-column: 1 / span 8; }
+.no-js .steps { grid-column: 1 / span 8; }
+.no-js .step, .no-js .step:last-child { min-height: 0; }
+.no-js .step-inner { position: static; }
+.no-js .step:last-child .step-inner { border-bottom: 1px solid var(--line); }
+.no-js .step-body { color: var(--ink); }
+
+/* ===== Narrow screens ===== */
+
+@media (max-width: 959px) {
+  :root {
+    --bar-h: 36px;
+    --foot-h: 88px;
+    --view-h: clamp(190px, 36vh, 330px);
+    --stage-top: 0px;
+  }
+  /* Title above the stage; the intro and disclaimer scroll under it while the floor scene holds. */
+  .story-head { display: contents; }
+  .story-title { grid-column: 1 / -1; grid-row: 1; padding-bottom: 32px; }
+  .story-lede { grid-column: 1 / -1; grid-row: 3; padding: 34px 0 48px; }
+  .story-intro { margin-top: 0; }
+  /* The stage pins to the top while the steps scroll under it, so scrolling drives it on touch. */
+  .stage-col { display: contents; }
+  .stage {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    align-self: start;
+    top: 0;
+    z-index: 3;
+    margin: 0 calc(-1 * var(--gutter));
+    border-left: 0;
+    border-right: 0;
+  }
+  .stage-bar { padding-left: var(--gutter); padding-right: calc(var(--gutter) - 8px); }
+  .stage-foot { padding: 10px var(--gutter); font-size: 10.5px; }
+  .steps, .no-js .steps { grid-column: 1 / -1; grid-row: 4; }
+  .no-js .story-lede { grid-row: 2; padding-top: 0; }
+  .no-js .steps { grid-row: 3; }
+  .step { min-height: 62vh; }
+  .step:last-child { min-height: 72vh; }
+  .step-inner { position: static; padding: 26px 0 28px 22px; }
+  .step-inner::before { top: 30px; bottom: 32px; }
+}
+
+@media (max-width: 719px) {
+  .stage-label { font-size: 0.75rem; }
+  .stage-bar { gap: 8px; }
+}
+
+/* Touch screens: the jump buttons get a bigger target than a mouse needs. */
+@media (pointer: coarse) {
+  .stage-tick { width: 26px; height: 36px; }
+}
+
+/* ===== Contact: the drawn "Start here" arrow ===== */
+
+/* topics.js draws it only when variant E asks (initTopics({ drawnArrow: true })),
+   so its style lives here rather than in topics.css, which stays variant A's. */
+.topics-arrow {
+  display: inline-block;
+  width: 0.95em;
+  height: 0.7em;
+  margin-left: 0.45em;
+  vertical-align: 0.02em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

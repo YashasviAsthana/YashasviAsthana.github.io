@@ -1,0 +1,55 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+// The Nimble section is picked at build time (astro.config.mjs): the stage
+// (NimbleStage.astro, variant E, the default) or, with PUBLIC_VARIANT=a, the
+// list and live view (Nimble.astro, variant A). Only the picked one is bundled.
+import Nimble from "@variant/nimble-section";
+import Projects from "../components/Projects.astro";
+import Path from "../components/Path.astro";
+import Contact from "../components/Contact.astro";
+import Footer from "../components/Footer.astro";
+import { CONTENT, SITE } from "../data/content";
+
+// Structured data for search engines. No email address here, on purpose.
+const person = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: CONTENT.name,
+  url: SITE.url,
+  jobTitle: CONTENT.role,
+  worksFor: { "@type": "Organization", name: CONTENT.nimble.org, url: CONTENT.nimble.href },
+  alumniOf: [
+    { "@type": "CollegeOrUniversity", name: "Penn State" },
+    { "@type": "CollegeOrUniversity", name: "Vellore Institute of Technology" },
+  ],
+  sameAs: CONTENT.links.filter((l) => l.href).map((l) => l.href),
+};
+---
+
+<Base path="/">
+  <script type="application/ld+json" slot="head" is:inline set:html={JSON.stringify(person)} />
+  <a class="skip" href="#main">Skip to content</a>
+  <Hero />
+  <main id="main">
+    <Nimble />
+    <Projects />
+    <Path />
+    <Contact />
+  </main>
+  <Footer />
+</Base>
+
+<script>
+  import { initEmailLinks } from "../scripts/email";
+  import { initDispatch } from "../scripts/dispatch";
+  import { initTopics } from "../scripts/topics";
+  // variant-e.js (the stage) or variant-a.js (nothing extra), per the build.
+  import { initNimble, TOPICS } from "@variant/nimble-script";
+
+  initEmailLinks();
+  // One simulation: the hero draws it; variant E's stage reads the same floor.
+  const floor = initDispatch();
+  initNimble(floor);
+  initTopics(TOPICS);
+</script>

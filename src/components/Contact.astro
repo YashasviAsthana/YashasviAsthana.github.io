@@ -1,0 +1,42 @@
+---
+// Contact: the headline, the conversation starters and the links. The
+// starters render as a plain list here; src/scripts/topics.ts swaps that for
+// the chips, the little animations and the "Start here" email links.
+import { CONTENT } from "../data/content";
+import LinkList from "./LinkList.astro";
+import "../styles/topics.css";
+
+const T = CONTENT.talk;
+---
+
+<section class="section" id="contact" aria-labelledby="contact-h">
+  <div class="grid">
+    <div class="sec-head">
+      <h2 id="contact-h">{CONTENT.contactHeading}</h2>
+    </div>
+    <div class="sec-body">
+      <p class="contact-line">{CONTENT.contact}</p>
+      <div class="topics" data-topics>
+        <p class="topics-sub">{T.sub}</p>
+        <ul class="topics-static">
+          {
+            T.groups.map((g) => (
+              <li>
+                <span class="topics-gname">{g.name}</span>
+                <dl>
+                  {g.topics.map((t) => (
+                    <div>
+                      <dt>{t.label}</dt>
+                      <dd>{t.line}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <LinkList primary={2} label="Contact links" extraClass="links--contact" />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,75 @@
+/* Conversation starters in the contact section (ported from the mockup's
+   topics.js, which injected these rules at runtime). The stage is a fixed
+   168x96 CSS px canvas. */
+
+.topics { margin-top: 22px; max-width: 64ch; }
+.topics-sub { margin: 0 0 22px; color: var(--muted); font-family: var(--font-body); font-size: 1.02rem; line-height: 1.55; }
+.topics-groups { display: flex; flex-wrap: wrap; gap: 14px 28px; }
+.topics-group { display: flex; flex-direction: column; gap: 8px; }
+.topics-gname { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.topics-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.topics-chip {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: .92rem;
+  line-height: 1.2;
+  transition: border-color .15s, background-color .15s, color .15s;
+}
+.topics-chip:hover { border-color: var(--accent); }
+.topics-chip:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
+.topics-chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.topics-group--off .topics-chip[aria-pressed="true"] { background: var(--accent-2); border-color: var(--accent-2); color: var(--accent-ink); }
+.topics-out {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  padding: 4px 0 4px 18px;
+  border-left: 2px solid var(--accent);
+  min-height: 104px;
+}
+.topics-out[data-group="off"] { border-left-color: var(--accent-2); }
+.topics-stage {
+  display: block;
+  width: 168px;
+  height: 96px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+}
+.topics-stage[hidden] { display: none; }
+.topics-line { margin: 0; font-family: var(--font-body); font-size: 1.12rem; line-height: 1.5; color: var(--ink); animation: topics-in .35s ease-out both; }
+.topics-cta {
+  display: inline-block;
+  margin-top: 10px;
+  padding-block: 10px;
+  margin-block: 0 -10px;
+  font-family: var(--font-mono);
+  font-size: .84rem;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-2);
+  text-underline-offset: 4px;
+}
+.topics-cta:hover { text-decoration-thickness: 2px; }
+@keyframes topics-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (max-width: 520px) { .topics-out { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .topics-line { animation: none; } .topics-chip { transition: none; } }
+
+/* Without JavaScript: every starter is listed in full instead of behind chips. */
+.topics-static { margin: 0; padding: 0; list-style: none; display: grid; gap: 18px; }
+.topics-static .topics-gname { display: block; margin-bottom: 8px; }
+.topics-static dl { margin: 0; display: grid; gap: 10px; }
+.topics-static dt { font-weight: 600; color: var(--ink); }
+.topics-static dd { margin: 2px 0 0; color: var(--muted); }

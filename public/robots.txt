@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yashasviasthana.github.io/sitemap-index.xml

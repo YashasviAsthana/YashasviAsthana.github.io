@@ -1,0 +1,31 @@
+/* Design tokens: the Iridescent palette and the Wide future type pairing.
+   Deep space with iridescent lilac and mint. Every color and font on the
+   site, including the canvases, comes from these custom properties. */
+
+:root {
+  /* Palette: Iridescent */
+  --bg: #0A0F24;
+  --surface: #11183A;
+  --surface-2: #19224D;
+  --ink: #EEF0FF;
+  --muted: #9CA4CC;
+  --line: #26305E;
+  --accent: #A594FF;
+  --accent-2: #6FE3D0;
+  --accent-ink: #0A0F24;
+  --scheme: dark;
+
+  /* Type: Wide future. The metric-matched fallbacks keep the swap from
+     shifting the layout while the webfonts load. */
+  --font-display: "Unbounded", "Unbounded Fallback", sans-serif;
+  --font-body: "Onest", "Onest Fallback", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --display-weight: 600;
+  --display-tracking: -0.02em;
+
+  /* Unbounded is very wide; these keep the headline measure steady. */
+  --d-scale: 0.62;
+  --d-lead: 1.06;
+
+  color-scheme: dark;
+}

@@ -1,0 +1,36 @@
+---
+// The GitHub, LinkedIn and Email buttons. The email button has no address in
+// the HTML: src/scripts/email.ts fills in the mailto at runtime, and the
+// whole item is hidden when JavaScript is off.
+import { CONTENT } from "../data/content";
+
+interface Props {
+  /** Index of the link drawn as the primary (filled) button. */
+  primary: number;
+  label: string;
+  extraClass?: string;
+}
+
+const { primary, label, extraClass } = Astro.props;
+---
+
+<ul class:list={["links", extraClass]} aria-label={label}>
+  {
+    CONTENT.links.map((l, i) => {
+      const cls = i === primary ? "btn btn--primary" : "btn";
+      return l.kind === "email" ? (
+        <li data-js>
+          <a class={cls} data-mailto>
+            {l.label}
+          </a>
+        </li>
+      ) : (
+        <li>
+          <a class={cls} href={l.href}>
+            {l.label}
+          </a>
+        </li>
+      );
+    })
+  }
+</ul>

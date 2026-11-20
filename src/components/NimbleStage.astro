@@ -1,0 +1,64 @@
+---
+// Variant E (the default): one framed, sticky stage onto the hero's floor that
+// walks through the five systems as the reader scrolls (ported from the A + D
+// blend). Variant A renders Nimble.astro instead; astro.config.mjs picks one.
+// The steps are plain text in the HTML, so without JavaScript every system's
+// name and body still read in full; src/scripts/stage-story.js turns the names
+// into buttons and drives the stage, and stage-gl.js draws it with Three.js.
+// Class names differ from Nimble.astro's (story-*, section--stage) so the two
+// variants' styles never meet; this section's styles live in stage.css.
+import { CONTENT } from "../data/content";
+import "../styles/stage.css";
+
+const N = CONTENT.nimble;
+const host = N.href.replace(/^https?:\/\/|\/$/g, "");
+---
+
+<section class="section section--stage" id="nimble" aria-labelledby="nimble-h">
+  <div class="grid story">
+    <div class="story-head">
+      <div class="story-title">
+        <h2 id="nimble-h">{N.heading}</h2>
+        <p class="story-meta">{N.role}, {N.years}, <a href={N.href}>{host}</a></p>
+        <ul class="tags" aria-label="Topics">
+          {N.tags.map((t) => <li>{t}</li>)}
+        </ul>
+      </div>
+      <div class="story-lede">
+        <p class="story-intro">{N.intro}</p>
+        <p class="disclaimer">{N.disclaimer}</p>
+      </div>
+    </div>
+
+    <div class="stage-col" data-js>
+      <figure class="stage" id="stage" aria-labelledby="stage-label">
+        <div class="stage-bar">
+          <span class="stage-dot" aria-hidden="true"></span>
+          <span class="stage-label" id="stage-label" data-stage-label aria-live="polite">{CONTENT.stage.floorLabel}</span>
+          <span class="stage-ticks" data-stage-ticks></span>
+        </div>
+        <div class="stage-view" data-stage-view>
+          <canvas class="stage-canvas" id="stage-canvas" aria-hidden="true"></canvas>
+          <canvas class="stage-still" id="stage-still" aria-hidden="true"></canvas>
+          <div class="stage-labels" data-stage-labels aria-hidden="true"></div>
+        </div>
+        <figcaption class="stage-foot" data-stage-foot></figcaption>
+      </figure>
+    </div>
+
+    <ol class="steps" aria-label="Systems">
+      {
+        N.systems.map((sys, i) => (
+          <li class="step" id={`sys-${sys.id}`} data-id={sys.id} data-slot={String(i + 1)}>
+            <div class="step-inner">
+              <h3 class="step-name" data-name>
+                {sys.name}
+              </h3>
+              <p class="step-body">{sys.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

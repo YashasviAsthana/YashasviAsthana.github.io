@@ -1,0 +1,51 @@
+---
+// The centerpiece. Each system is a button (added by the sim script) that
+// points the live view at its counterpart on the floor.
+import { CONTENT } from "../data/content";
+
+const N = CONTENT.nimble;
+const host = N.href.replace(/^https?:\/\/|\/$/g, "");
+---
+
+<section class="section section--nimble" id="nimble" aria-labelledby="nimble-h">
+  <div class="grid nimble-grid">
+    <div class="nimble-head">
+      <h2 id="nimble-h">{N.heading}</h2>
+      <p class="nimble-meta">{N.role}, {N.years}, <a href={N.href}>{host}</a></p>
+      <p class="nimble-intro">{N.intro}</p>
+    </div>
+
+    <div class="monitor-col" data-js>
+      <figure class="monitor" id="monitor-fig">
+        <div class="monitor-bar">
+          <span class="monitor-dot" aria-hidden="true"></span>
+          <span class="monitor-label">{N.liveLabel}</span>
+          <span class="monitor-note">{N.liveNote}</span>
+        </div>
+        <canvas class="monitor-canvas" id="monitor" role="img" aria-label="Live view of the illustrative fleet simulation"></canvas>
+        <figcaption class="readout">
+          <p class="readout-title" data-readout-title aria-live="polite"></p>
+          <div class="readout-body" data-readout-body></div>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="systems-col">
+      <ul class="systems" aria-label="Systems">
+        {
+          N.systems.map((sys, i) => (
+            <li class:list={["sys", { "is-active": i === 0 }]} data-id={sys.id}>
+              <h3 class="sys-name" data-name>
+                {sys.name}
+              </h3>
+              <p class="sys-body">{sys.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="tags" aria-label="Topics">
+        {N.tags.map((t) => <li>{t}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>

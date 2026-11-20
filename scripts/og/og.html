@@ -1,0 +1,182 @@
+<!doctype html>
+<!-- Social card source (1200x630). A still of the hero: the warehouse floor in
+     the Iridescent palette, the name stencilled on the staging band, and the
+     headline in its keep-out panel. Rendered to public/og.png by render.mjs.
+     Fonts load straight from node_modules, so run `npm install` first. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>og</title>
+  <style>
+    @font-face { font-family: "Unbounded"; font-weight: 200 900; src: url("../../node_modules/@fontsource-variable/unbounded/files/unbounded-latin-wght-normal.woff2") format("woff2"); }
+    @font-face { font-family: "Onest"; font-weight: 100 900; src: url("../../node_modules/@fontsource-variable/onest/files/onest-latin-wght-normal.woff2") format("woff2"); }
+    @font-face { font-family: "JetBrains Mono"; font-weight: 100 800; src: url("../../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); }
+    :root {
+      --bg: #0A0F24; --surface: #11183A; --surface-2: #19224D;
+      --ink: #EEF0FF; --muted: #9CA4CC; --line: #26305E;
+      --accent: #A594FF; --accent-2: #6FE3D0;
+    }
+    html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: var(--bg); }
+    canvas { position: absolute; inset: 0; width: 1200px; height: 630px; }
+    .panel {
+      position: absolute; left: 0; top: 330px; width: 660px; height: 300px;
+      box-sizing: border-box; padding: 40px 48px 0 48px;
+      font-family: "Onest", sans-serif; color: var(--ink);
+    }
+    .role { margin: 0 0 16px; color: var(--muted); font-size: 22px; line-height: 1.3; }
+    .headline {
+      margin: 0; font-family: "Unbounded", sans-serif; font-weight: 600; letter-spacing: -0.02em;
+      font-size: 40px; line-height: 1.08;
+    }
+    .url { margin: 22px 0 0; font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--accent-2); }
+    .note {
+      position: absolute; right: 30px; bottom: 22px; margin: 0; padding: 6px 10px;
+      font-family: "JetBrains Mono", monospace; font-size: 14px; color: var(--muted); background: var(--bg);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c" width="2400" height="1260"></canvas>
+  <div class="panel">
+    <p class="role">Senior Software Engineer</p>
+    <p class="headline">I build the software that decides who does what, and when.</p>
+    <p class="url">yashasviasthana.github.io</p>
+  </div>
+  <p class="note">Illustrative simulation, not Nimble's software</p>
+  <script>
+    const W = 1200, H = 630, CELL = 30, COLS = 40, ROWS = 21;
+    const css = getComputedStyle(document.documentElement);
+    const v = (n) => css.getPropertyValue(n).trim();
+    const col = { bg: v("--bg"), s2: v("--surface-2"), ink: v("--ink"), muted: v("--muted"), line: v("--line"), accent: v("--accent"), accent2: v("--accent-2") };
+    const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+    const X = (c) => c * CELL, Y = (r) => r * CELL;
+    const mid = (c) => c * CELL + CELL / 2;
+    function rr(g, x, y, w, h, r) { g.beginPath(); g.roundRect(x, y, w, h, r); }
+    function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+    // Racks: back-to-back pairs with a cross-aisle every seventh column.
+    const rack = new Set();
+    const rackRows = (r0, r1, c0, c1) => { for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) if ((c - c0) % 7 !== 6) rack.add(r * COLS + c); };
+    rackRows(1, 2, 1, 34);
+    rackRows(12, 13, 23, 34);
+    rackRows(15, 16, 23, 34);
+    rackRows(18, 19, 23, 34);
+    const stations = [3, 7, 11, 15];
+    const panel = { c0: 0, c1: 21, r0: 11, r1: 20 };
+
+    async function draw() {
+      await document.fonts.load('600 100px "Unbounded"');
+      await document.fonts.load('400 22px "Onest"');
+      await document.fonts.load('400 14px "JetBrains Mono"');
+      await document.fonts.ready;
+      const cv = document.getElementById("c"), g = cv.getContext("2d");
+      g.scale(2, 2);
+      g.fillStyle = col.bg; g.fillRect(0, 0, W, H);
+
+      // Name stencil on the staging band (rows 4 to 9).
+      const band = { x: 30, y: Y(4), w: X(35) - 45, h: CELL * 6 };
+      const nc = document.createElement("canvas"); nc.width = band.w * 2; nc.height = band.h * 2;
+      const n = nc.getContext("2d"); n.scale(2, 2);
+      const lines = ["YASHASVI", "ASTHANA"];
+      n.font = '600 100px "Unbounded"'; n.letterSpacing = "5px";
+      const cap = n.measureText("H").actualBoundingBoxAscent / 100;
+      const w100 = Math.max(...lines.map((t) => n.measureText(t).width));
+      const s = Math.min((band.w * 0.97) / (w100 / 100), (band.h * 0.84) / (cap * 2.3));
+      n.font = `600 ${s}px "Unbounded"`; n.letterSpacing = (0.05 * s).toFixed(2) + "px";
+      n.fillStyle = col.accent;
+      let y = (band.h - cap * s * 2.3) / 2 + cap * s;
+      for (const t of lines) { n.fillText(t, 0, y); y += cap * s * 1.3; }
+      n.globalCompositeOperation = "destination-out";
+      const rng = mulberry32(99);
+      for (let i = 0; i < (band.w * band.h) / 180; i++) { n.globalAlpha = 0.25 + rng() * 0.7; const r = 0.5 + rng() * 1.6; n.fillRect(rng() * band.w, rng() * band.h, r, r); }
+      for (let i = 0; i < band.h / 3; i++) { n.globalAlpha = 0.06 + rng() * 0.2; n.fillRect(rng() * band.w - 40, rng() * band.h, 40 + rng() * band.w * 0.35, 0.8 + rng() * 2.4); }
+      n.globalAlpha = 1; n.globalCompositeOperation = "source-over";
+      g.globalAlpha = 0.22; g.drawImage(nc, band.x, band.y, band.w, band.h); g.globalAlpha = 1;
+
+      // Floor joints.
+      g.strokeStyle = rgba(col.line, 0.75); g.lineWidth = 1; g.beginPath();
+      for (let c = 0; c <= COLS; c++) { g.moveTo(X(c) + 0.5, 0); g.lineTo(X(c) + 0.5, H); }
+      for (let r = 0; r <= ROWS; r++) { g.moveTo(0, Y(r) + 0.5); g.lineTo(W, Y(r) + 0.5); }
+      g.stroke();
+
+      // Racks, merged into runs.
+      for (let r = 0; r < ROWS; r++) {
+        let c = 0;
+        while (c < COLS) {
+          if (!rack.has(r * COLS + c)) { c++; continue; }
+          let e = c; while (rack.has(r * COLS + e + 1)) e++;
+          const above = rack.has((r - 1) * COLS + c), below = rack.has((r + 1) * COLS + c);
+          const x = X(c) + 2, w = (e - c + 1) * CELL - 4, yy = Y(r) + (above ? 1 : 3), hh = CELL - (above ? 1 : 3) - (below ? 1 : 3);
+          g.fillStyle = col.s2; g.fillRect(x, yy, w, hh);
+          g.strokeStyle = col.line; g.strokeRect(x + 0.5, yy + 0.5, w - 1, hh - 1);
+          c = e + 1;
+        }
+      }
+
+      // Stations on the right edge.
+      g.font = '500 10px "JetBrains Mono"'; g.textAlign = "center"; g.textBaseline = "middle";
+      stations.forEach((r, i) => {
+        const x = X(38) + 3, yy = Y(r) + 3, w = CELL * 2 - 3, hh = CELL * 2 - 6;
+        g.fillStyle = rgba(col.accent2, 0.16); g.fillRect(x, yy, w, hh);
+        g.strokeStyle = rgba(col.accent2, 0.9); g.lineWidth = 1.5; g.strokeRect(x + 0.75, yy + 0.75, w - 1.5, hh - 1.5);
+        g.fillStyle = col.accent2; g.fillRect(x, yy + CELL * 0.18, 3, CELL * 0.64);
+        g.fillText(String(i + 1), x + w / 2 + 1, yy + hh - CELL * 0.42);
+        g.lineWidth = 1;
+      });
+
+      // Routes: teal dashes to a pick, solid lilac while carrying.
+      const route = (pts, carrying) => {
+        g.strokeStyle = carrying ? rgba(col.accent, 0.42) : rgba(col.accent2, 0.5);
+        g.lineWidth = 1.75; g.lineJoin = "round"; g.lineCap = "round"; g.setLineDash(carrying ? [] : [2, 5]);
+        g.beginPath(); pts.forEach(([c, r], k) => (k ? g.lineTo(mid(c), mid(r)) : g.moveTo(mid(c), mid(r)))); g.stroke(); g.setLineDash([]);
+      };
+      route([[9, 6], [9, 3], [12, 3]], false);
+      route([[27, 10], [27, 3], [31, 3]], false);
+      route([[35, 7], [37, 7]], true);
+      route([[24, 11], [35, 11], [35, 15], [37, 15]], true);
+      route([[16, 8], [16, 10], [22, 10], [22, 14], [25, 14]], false);
+
+      // Orders on rack faces: claimed ones wear a teal frame.
+      const order = (c, r, claimed) => {
+        const ts = CELL * 0.34, x = mid(c), yy = mid(r);
+        if (claimed) { g.strokeStyle = rgba(col.accent2, 0.85); g.lineWidth = 1.25; const q = ts * 1.55; g.strokeRect(x - q / 2, yy - q / 2, q, q); }
+        else { g.strokeStyle = rgba(col.accent, 0.35); g.lineWidth = 1; const q = ts * 1.7; g.strokeRect(x - q / 2, yy - q / 2, q, q); }
+        g.fillStyle = col.accent; rr(g, x - ts / 2, yy - ts / 2, ts, ts, ts * 0.18); g.fill();
+      };
+      order(12, 2.8, true); order(31, 2.8, true); order(25, 13.8, true); order(19, 1.2, false); order(29, 15.2, false); order(4, 2.8, false);
+
+      // Robots: idle ones dim in the band, carriers glow lilac, pickers show a teal light.
+      const robot = (c, r, kind, ang = 0) => {
+        const size = CELL * 0.62, x = mid(c), yy = mid(r);
+        g.save(); g.translate(x, yy); g.rotate(ang);
+        if (kind === "carry") { g.shadowColor = rgba(col.accent, 0.95); g.shadowBlur = CELL * 0.7; }
+        g.globalAlpha = kind === "idle" ? 0.62 : 1;
+        g.fillStyle = col.ink; rr(g, -size / 2, -size / 2, size, size, size * 0.24); g.fill();
+        g.shadowBlur = 0; g.shadowColor = "transparent";
+        if (kind === "carry") { const t = size * 0.46; g.fillStyle = col.accent; rr(g, -t / 2 - size * 0.06, -t / 2, t, t, t * 0.2); g.fill(); }
+        if (kind === "pick") { g.fillStyle = col.accent2; g.beginPath(); g.arc(-size * 0.06, 0, size * 0.15, 0, Math.PI * 2); g.fill(); }
+        g.fillStyle = col.bg; g.fillRect(size / 2 - size * 0.2, -size * 0.26, size * 0.09, size * 0.52);
+        g.restore(); g.globalAlpha = 1;
+      };
+      robot(9, 6, "pick", -Math.PI / 2); robot(27, 10, "pick", -Math.PI / 2); robot(16, 8, "pick", Math.PI / 2);
+      robot(35, 7, "carry"); robot(24, 11, "carry"); robot(37, 3, "carry"); robot(36, 17, "carry", Math.PI / 2);
+      robot(3, 5, "idle"); robot(7, 9, "idle"); robot(13, 5, "idle", Math.PI / 2); robot(21, 7, "idle"); robot(29, 5, "idle"); robot(33, 9, "idle", Math.PI); robot(18, 3, "move");
+      robot(31, 17, "move", Math.PI / 2);
+
+      // The text panel is a keep-out zone with hatched floor paint on its open edges.
+      const x0 = 0, y0 = Y(panel.r0), x1 = X(panel.c1 + 1), y1 = H;
+      g.fillStyle = col.bg; g.fillRect(x0, y0, x1 - x0, y1 - y0);
+      const hatch = (x, yy, w, hh) => {
+        g.save(); g.beginPath(); g.rect(x, yy, w, hh); g.clip();
+        g.strokeStyle = rgba(col.accent, 0.5); g.lineWidth = 5.4; g.beginPath();
+        for (let d = -hh; d < w + hh; d += 10.8) { g.moveTo(x + d, yy + hh); g.lineTo(x + d + hh, yy); }
+        g.stroke(); g.restore();
+      };
+      hatch(x0, y0, x1 - x0, 7);
+      hatch(x1 - 7, y0, 7, y1 - y0);
+      document.title = "ready";
+    }
+    draw();
+  </script>
+</body>
+</html>

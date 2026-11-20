@@ -1,0 +1,45 @@
+---
+// The warehouse floor. The canvas, telemetry booth and hints only render with
+// JavaScript; without it the hero shows grid paint, the stencilled name and the
+// panel text.
+import { CONTENT } from "../data/content";
+import LinkList from "./LinkList.astro";
+
+const words = CONTENT.name.split(" ");
+---
+
+<header class="hero" id="top">
+  <canvas
+    class="floor"
+    id="floor"
+    tabindex="0"
+    data-js
+    aria-label="Illustrative warehouse floor simulation. Robots claim orders from the racks and carry them to pick stations. Press Enter to place an order."
+    aria-describedby="floor-hint"></canvas>
+  <p class="floor-static" aria-hidden="true">{words.map((w) => <span>{w}</span>)}</p>
+
+  <h1 class="vh">{CONTENT.name}</h1>
+
+  <div class="telemetry" id="telemetry" data-js>
+    <dl>
+      <dt>Fleet</dt><dd data-t="fleet">0</dd>
+      <dt>Orders assigned</dt><dd data-t="assigned">0</dd>
+      <dt>Median wait</dt><dd data-t="wait">0.0 s</dd>
+    </dl>
+    <div class="hint-block">
+      <p class="hint" id="floor-hint"><span class="hint-tile" aria-hidden="true"></span><span data-hint>{CONTENT.hero.hint}</span></p>
+      <p class="illus">{CONTENT.hero.illus}</p>
+    </div>
+  </div>
+
+  <div class="panel" id="panel">
+    <div class="hint-block hint-block--panel" data-js>
+      <p class="hint"><span class="hint-tile" aria-hidden="true"></span><span data-hint>{CONTENT.hero.hint}</span></p>
+      <p class="illus">{CONTENT.hero.illus}</p>
+    </div>
+    <p class="role">{CONTENT.role}</p>
+    <p class="headline">{CONTENT.hero.line}</p>
+    <p class="sub">{CONTENT.hero.sub}</p>
+    <LinkList primary={0} label="Links" />
+  </div>
+</header>

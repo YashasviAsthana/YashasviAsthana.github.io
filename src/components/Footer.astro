@@ -1,0 +1,22 @@
+---
+// Footer: the name, the fleet disclaimer plus how the simulation works, and a
+// way back up to the floor.
+import { CONTENT } from "../data/content";
+
+interface Props {
+  /** Where the last link points; the 404 page sends people home instead. */
+  backHref?: string;
+  backLabel?: string;
+}
+
+const { backHref = "#top", backLabel = "Back to the floor" } = Astro.props;
+---
+
+<footer class="foot">
+  <div class="stripe" aria-hidden="true"></div>
+  <div class="foot-row">
+    <p>{CONTENT.name}</p>
+    <p>{`${CONTENT.nimble.disclaimer} ${CONTENT.nimble.simTech}`}</p>
+    <p><a class="hit" href={backHref}>{backLabel}</a></p>
+  </div>
+</footer>

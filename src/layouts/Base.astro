@@ -1,0 +1,76 @@
+---
+// Shared document shell: meta tags, self-hosted fonts, tokens and global styles.
+import unbounded from "@fontsource-variable/unbounded/files/unbounded-latin-wght-normal.woff2?url";
+import onest from "@fontsource-variable/onest/files/onest-latin-wght-normal.woff2?url";
+import jetbrains from "@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url";
+import { CONTENT, SITE } from "../data/content";
+import "../styles/tokens.css";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Path of this page on the site, used for the canonical URL. */
+  path?: string;
+  noindex?: boolean;
+}
+
+const { title = CONTENT.name, description = CONTENT.description, path = "/", noindex = false } = Astro.props;
+const canonical = new URL(path, SITE.url).href;
+
+// Latin subset only. The fallback faces are Arial (or its metric twin
+// Liberation Sans) scaled to the webfont's width and vertical metrics, so the
+// swap barely moves anything. Measured in headless Chrome, 2026-11-20.
+const LATIN =
+  "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD";
+const fontFaces = `
+@font-face{font-family:"Unbounded";font-style:normal;font-display:swap;font-weight:200 900;src:url(${unbounded}) format("woff2");unicode-range:${LATIN}}
+@font-face{font-family:"Onest";font-style:normal;font-display:swap;font-weight:100 900;src:url(${onest}) format("woff2");unicode-range:${LATIN}}
+@font-face{font-family:"JetBrains Mono";font-style:normal;font-display:swap;font-weight:100 800;src:url(${jetbrains}) format("woff2");unicode-range:${LATIN}}
+@font-face{font-family:"Unbounded Fallback";src:local("Arial Bold"),local("Arial-BoldMT"),local("Liberation Sans Bold"),local("LiberationSans-Bold");size-adjust:130.3%;ascent-override:76.8%;descent-override:19.2%;line-gap-override:0%}
+@font-face{font-family:"Onest Fallback";src:local("Arial"),local("ArialMT"),local("Liberation Sans"),local("LiberationSans");size-adjust:104.9%;ascent-override:92.5%;descent-override:29.6%;line-gap-override:0%}
+`;
+---
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>document.documentElement.classList.replace("no-js", "js");</script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="author" content={CONTENT.name} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={CONTENT.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={SITE.ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={SITE.ogAlt} />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={SITE.ogImage} />
+    <meta name="twitter:image:alt" content={SITE.ogAlt} />
+
+    <link rel="preload" href={unbounded} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={onest} as="font" type="font/woff2" crossorigin />
+    <style is:inline set:html={fontFaces}></style>
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
